@@ -4,6 +4,7 @@
 # pragma once 
 
 #include "sjpg_log.h"
+#include "sjpg_markers.h"
 #include <vector>
 namespace sjpg_codec::segments {
 
@@ -13,7 +14,7 @@ const uint16_t kEmptyByte = 0x00;
 class SOISegment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
-  static const uint8_t marker = 0xD8;
+  static const uint8_t marker = JFIF_SOI;
 
   void print() const {
     LOG_INFO("SOI segment\n");
@@ -34,7 +35,7 @@ public:
   int thumbnail_width{0};
   int thumbnail_height{0};
   std::vector<uint8_t> thumbnail_data;
-  static const uint8_t marker = 0xE0;
+  static const uint8_t marker = JFIF_APP0;
 
   void print() const {
     LOG_INFO("APP0 segment\n");
@@ -56,7 +57,7 @@ public:
   size_t file_pos{0}; // segment start position in file(without marker)
   int length{0};
   std::vector<uint8_t> comment;
-  static const uint8_t marker = 0xFE;
+  static const uint8_t marker = JFIF_COM;
 
   void print() const {
     LOG_INFO("COM segment\n");
@@ -74,7 +75,7 @@ public:
   uint8_t precision{0};
   uint8_t q_table_id{0};
   std::vector<uint8_t> q_table;
-  static const uint8_t marker = 0xDB;
+  static const uint8_t marker = JFIF_DQT;
 
   void print() const {
     LOG_INFO("DQT segment\n");
@@ -97,7 +98,7 @@ public:
   std::vector<uint8_t> component_id;
   std::vector<uint8_t> sampling_factor;
   std::vector<uint8_t> quantization_table_id;
-  static const uint8_t marker = 0xC0;
+  static const uint8_t marker = JFIF_SOF0;
 
   void print() const {
     LOG_INFO("SOF0 segment\n");
@@ -123,7 +124,7 @@ public:
   uint8_t table_id{0};
   std::vector<uint8_t> symbol_counts;
   std::vector<uint8_t> symbols;
-  static const uint8_t marker = 0xC4;
+  static const uint8_t marker = JFIF_DHT;
 
   void print() const {
     LOG_INFO("DHT segment\n");
@@ -154,7 +155,7 @@ public:
   std::vector<uint8_t> component_id;
   std::vector<uint8_t> huffman_table_id_dc;
   std::vector<uint8_t> huffman_table_id_ac;
-  static const uint8_t marker = 0xDA;
+  static const uint8_t marker = JFIF_SOS;
 
   void print() {
     LOG_INFO("SOS segment\n");
@@ -172,7 +173,7 @@ public:
 class EOISegment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
-  static const uint8_t marker = 0xD9;
+  static const uint8_t marker = JFIF_EOI;
 
   void print() const {
     LOG_INFO("EOI segment\n");
