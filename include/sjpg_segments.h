@@ -65,22 +65,47 @@ public:
   }
 };
 
+class QuantizationTable {
+public:
+  uint8_t id{0};
+  uint8_t precision{0}; // 0: 8-bit, 1: 16-bit
+  std::vector<uint8_t> data;
+  size_t segment_pos{0}; // 在哪个 dqt 段中定义的
+
+  void print() const {
+    LOG_INFO("Quantization Table\n");
+    LOG_INFO("\tTable ID: %d\n", id);
+    LOG_INFO("\tPrecision: %d (%s)\n", precision, precision ? "16-bit" : "8-bit");
+    LOG_INFO("\tData size: %zu values\n", data.size());
+
+    // 打印8x8矩阵
+    LOG_INFO("\tMatrix:\n");
+    for (int i = 0; i < 8; ++i) {
+      LOG_INFO("\t\t");
+      for (int j = 0; j < 8; ++j) {
+        LOG_INFO("%3d ", data[i*8 + j]);
+      }
+      LOG_INFO("\n");
+    }
+  }
+};
+
 class DQTSegment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
   uint16_t length{0};
-  uint8_t precision{0};
-  uint8_t q_table_id{0};
-  std::vector<uint8_t> q_table;
+  std::vector<QuantizationTable> tables;
   static const uint8_t marker = JFIF_DQT;
 
   void print() const {
-    LOG_INFO("DQT segment\n");
+    LOG_INFO("DQT Segment\n");
     LOG_INFO("\tFile position: %zu\n", file_pos);
     LOG_INFO("\tLength: %d\n", length);
-    LOG_INFO("\tPrecision: %d\n", precision);
-    LOG_INFO("\tQ table id: %d\n", q_table_id);
-    LOG_INFO("\tQ table size: %zu\n", q_table.size());
+    LOG_INFO("\tNumber of tables: %zu\n", tables.size());
+
+    for (const auto& table : tables) {
+      table.print();
+    }
   }
 };
 

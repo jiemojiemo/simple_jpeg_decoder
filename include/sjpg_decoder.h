@@ -203,7 +203,7 @@ private:
     const auto &ac_table = huffman_table_.at({ac_or_dc, htable_dc_id});
 
     const auto qtable_id = sof0_.quantization_table_id[component_id];
-    const auto &qtable = dqt_[qtable_id].q_table;
+    const auto &qtable = *(q_table_refs[qtable_id]);
 
     // decode ac value
     auto dc_code_length = dc_htable.getSymbol(st_);
@@ -211,7 +211,7 @@ private:
     int16_t dc_value = decodeNumber(dc_code_length, dc_bits) + pre_dc_value;
     pre_dc_value = dc_value;
 
-    int16_t dequant_dc_value = dc_value * qtable[0];
+    int16_t dequant_dc_value = dc_value * qtable.data[0];
     decoded_data[index++] = dequant_dc_value;
 
     // decode dc value
@@ -234,7 +234,7 @@ private:
       // insert 0s
       index += zero_count;
       // insert non zero value
-      auto de_quant_value = non_zero_value * qtable[index];
+      auto de_quant_value = non_zero_value * qtable.data[index];
       decoded_data[index++] = de_quant_value;
     }
 
@@ -332,16 +332,24 @@ private:
     dqt.file_pos = in_file_.tellg();
     dqt.length = read2BytesBigEndian();
     auto tmp = readByte();
-    dqt.precision = tmp >> 4;
-    dqt.q_table_id = tmp & 0x0F;
+
+    QuantizationTable table;
+    table.precision = tmp >> 4;
+    table.id = tmp & 0x0F;
 
     const static int q_table_size = kMCUPixelSize;
-    dqt.q_table.resize(q_table_size);
-    in_file_.read(reinterpret_cast<char *>(dqt.q_table.data()), q_table_size);
-
-    dqt_.push_back(dqt);
+    table.data.resize(q_table_size);
+    in_file_.read(reinterpret_cast<char *>(table.data.data()), q_table_size);
 
     dqt.print();
+
+    dqt.tables.emplace_back(table);
+    dqt_.emplace_back(dqt);
+
+    auto& last_segment = dqt_.back();
+    for (auto& table : last_segment.tables) {
+      q_table_refs[table.id] = &table;
+    }
   }
 
   int parseSOF0Segment() {
@@ -469,6 +477,8 @@ private:
   APP0Segment app0_;
   COMSegment com_;
   std::vector<DQTSegment> dqt_;
+  std::array<QuantizationTable*, 16> q_table_refs{nullptr}; // 快速访问引用
+
   SOF0Segment sof0_;
   std::vector<DHTSegment> dht_;
   std::map<std::pair<uint8_t, uint8_t>, HuffmanTable>
