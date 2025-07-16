@@ -47,7 +47,7 @@ public:
       }
 
       auto b = readByte();
-      if (b == kJFIFByteFF) {
+      if (b == JFIF_BYTE_FF) {
         b = readByte();
         ret = parseSegment(b);
       }
@@ -427,14 +427,14 @@ private:
     for (;;) {
       auto b = readByte();
 
-      if (b == kJFIFByteFF) {
+      if (b == JFIF_BYTE_FF) {
         auto pre_b = b;
         auto next_b = readByte();
 
         if (next_b == EOISegment::marker) {
           parseEOISegment();
           break;
-        } else if (next_b == kEmptyByte) {
+        } else if (next_b == JFIF_BYTE_0) {
           std::bitset<8> bits(pre_b);
           st_.append(bits.to_string());
           continue;

@@ -8,9 +8,6 @@
 #include <vector>
 namespace sjpg_codec::segments {
 
-const uint16_t kJFIFByteFF = 0xFF;
-const uint16_t kEmptyByte = 0x00;
-
 class SOISegment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
