@@ -171,8 +171,9 @@ private:
     dqt_segments_.emplace_back(dqt);
 
     auto &last_segment = dqt_segments_.back();
-    for (auto &t : last_segment.tables) {
-      q_table_refs[t.id] = &table;
+    for (auto i = 0; i < last_segment.tables.size(); i++) {
+      auto table_id = last_segment.tables[i].id;
+      q_table_refs[table_id] = &last_segment.tables[i];
     }
   }
 

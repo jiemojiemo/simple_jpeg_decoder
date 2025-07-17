@@ -62,5 +62,12 @@ TEST_F(AJEPGDecoder, CanBuildBitStream) {
 TEST_F(AJEPGDecoder, DecodeSuccessGetYUVData) {
   auto ret = decoder.decode(parser);
 
-  ASSERT_THAT(ret, Eq(0));
+  auto y = decoder.getYDecodedData();
+  auto u = decoder.getUDecodedData();
+  auto v = decoder.getVDecodedData();
+
+  auto expected_size = parser.getSOF0Segment()->width * parser.getSOF0Segment()->height;
+  ASSERT_THAT(y.size(), Eq(expected_size));
+  ASSERT_THAT(u.size(), Eq(expected_size));
+  ASSERT_THAT(v.size(), Eq(expected_size));
 }

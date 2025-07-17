@@ -44,13 +44,20 @@ public:
         auto u_data = deHuffman(parser, 1, pre_dc_value_u);
         auto v_data = deHuffman(parser, 2, pre_dc_value_v);
 
+        // LOG_INFO("%d y[16]%d, u[16]%d, v[16]%d\n",mcu_count, y_data[16], u_data[16], v_data[16]);
+
+
         auto zig_zag_y = deZigZag(y_data);
         auto zig_zag_u = deZigZag(u_data);
         auto zig_zag_v = deZigZag(v_data);
 
+        // LOG_INFO("%d zy[0]%d, zu[0]%d, zv[0]%d\n",mcu_count, zig_zag_y[0], zig_zag_u[0], zig_zag_v[0]);
+
         auto idct_y = idct(zig_zag_y);
         auto idct_u = idct(zig_zag_u);
         auto idct_v = idct(zig_zag_v);
+
+        // LOG_INFO("%d iy[0]%lf, iu[0]%lf, iv[0]%lf\n",mcu_count, idct_y[0], idct_u[0], idct_v[0]);
 
         levelShift(idct_y);
         levelShift(idct_u);
@@ -72,6 +79,18 @@ public:
 
     LOG_INFO("%d mcu decoded", mcu_count);
     return 0;
+  }
+
+  const std::vector<uint8_t>& getYDecodedData() const {
+    return y_decoded_data_;
+  }
+
+  const std::vector<uint8_t>& getUDecodedData() const {
+    return u_decoded_data_;
+  }
+
+  const std::vector<uint8_t>& getVDecodedData() const {
+    return v_decoded_data_;
   }
 
   // for testing
@@ -177,7 +196,7 @@ private:
 
       index += zero_count;
 
-      decoded_data[index++] = dc_value;
+      decoded_data[index++] = non_zero_value;
     }
 
     // dequant
@@ -203,7 +222,6 @@ private:
   }
 
   std::vector<float> idct(const std::vector<int16_t> &data) {
-    static constexpr float SQRT2 = 1.41421356f;
 
     std::vector<float> result(kMCUPixelSize, 0.0f);
     for (auto y = 0; y < 8; ++y) {
@@ -212,8 +230,8 @@ private:
 
         for (auto u = 0; u < 8; ++u) {
           for (auto v = 0; v < 8; ++v) {
-            float cu = (u == 0) ? 1.0f / SQRT2 : 1.0f;
-            float cv = (v == 0) ? 1.0f / SQRT2 : 1.0f;
+            float cu = (u == 0) ? 1.0f / std::sqrt(2.0f) : 1.0f;
+            float cv = (v == 0) ? 1.0f / std::sqrt(2.0f) : 1.0f;
             float t0 = cu * std::cos((2 * x + 1) * u * M_PI / 16.0);
             float t1 = cv * std::cos((2 * y + 1) * v * M_PI / 16.0);
 
@@ -228,6 +246,7 @@ private:
         result[x * 8 + y] = sum;
       }
     }
+
     return result;
   }
 

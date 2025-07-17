@@ -1,5 +1,9 @@
 #include "sjpg_decoder.h"
+#include "sjpg_jpeg_decoder.h"
+
 #include <iostream>
+
+using namespace sjpg_codec;
 void saveRGBTOPPM(uint8_t *data, int linesize, int width, int height,
                   const char *output_name) {
   FILE *pFile;
@@ -58,22 +62,29 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   auto file_path = argv[1];
-
-  sjpg_codec::Decoder decoder;
-  auto ok = decoder.open(file_path);
-  if (!ok) {
-    printf("Failed to open file: %s\n", file_path);
+  auto file_stream = std::ifstream(file_path, std::ios::binary);
+  if (!file_stream.is_open()) {
+    LOG_ERROR("Failed to open file: %s", file_path);
     return -1;
   }
 
-  auto ret = decoder.decodeImageFile();
+  JFIFParser parser;
+  auto ret = parser.parse(file_stream);
+  if (ret != 0) {
+    printf("Failed to parse file: %s\n", file_path);
+    return -1;
+  }
+
+  JPEGDecoder decoder;
+  ret = decoder.decode(parser);
   if (ret != 0) {
     printf("Failed to decode file: %s\n", file_path);
     return -1;
   }
 
-  auto img_width = decoder.getSOF0Segment().width;
-  auto img_height = decoder.getSOF0Segment().height;
+
+  auto img_width = parser.getSOF0Segment()->width;
+  auto img_height = parser.getSOF0Segment()->height;
   auto y_data = decoder.getYDecodedData();
   auto u_data = decoder.getUDecodedData();
   auto v_data = decoder.getVDecodedData();

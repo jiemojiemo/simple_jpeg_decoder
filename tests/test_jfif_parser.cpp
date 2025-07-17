@@ -89,7 +89,9 @@ TEST_F(AJFIFParser, ParserOKGetQTableRefs) {
 
   auto table_refs = parser.getQTableRefs();
   ASSERT_THAT(table_refs[0], NotNull());
+  ASSERT_THAT(table_refs[0]->data.size(), Eq(64));
   ASSERT_THAT(table_refs[1], NotNull());
+  ASSERT_THAT(table_refs[1]->data.size(), Eq(64));
 }
 
 TEST_F(AJFIFParser, ParserOKGetSOFOSegment) {

@@ -81,14 +81,19 @@ public:
         auto y_data = deHuffman(0, pre_dc_value_y);
         auto u_data = deHuffman(1, pre_dc_value_u);
         auto v_data = deHuffman(2, pre_dc_value_v);
+        // LOG_INFO("%d y[16]%d, u[16]%d, v[16]%d\n",mcu_count, y_data[16], u_data[16], v_data[16]);
 
         auto zig_zag_y = deZigZag(y_data);
         auto zig_zag_u = deZigZag(u_data);
         auto zig_zag_v = deZigZag(v_data);
 
+        // LOG_INFO("%d zy[0]%d, zu[0]%d, zv[0]%d\n",mcu_count, zig_zag_y[0], zig_zag_u[0], zig_zag_v[0]);
+
         auto idct_y = idct(zig_zag_y);
         auto idct_u = idct(zig_zag_u);
         auto idct_v = idct(zig_zag_v);
+
+        // LOG_INFO("%d iy[0]%lf, iu[0]%lf, iv[0]%lf\n",mcu_count, idct_y[0], idct_u[0], idct_v[0]);
 
         performLevelShift(idct_y);
         performLevelShift(idct_u);
