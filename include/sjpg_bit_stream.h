@@ -25,6 +25,9 @@ public:
     }
     return bits;
   }
+  const std::string& getStringData() const {
+    return data_;
+  }
 
 private:
   std::string data_;

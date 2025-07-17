@@ -63,29 +63,30 @@ public:
         }
       }
     }
-
+    LOG_INFO("Image data scanned, size: %zu bytes\n",
+             encoded_data_.size());
     return Success;
   }
 
-  const segments::SOISegment *getSOISegment() const { return soi_.get(); }
-  const segments::APP0Segment *getAPP0Segment() const { return app0_.get(); }
-  const segments::COMSegment *getCOMSegment() const { return com_.get(); }
-  const std::vector<segments::DQTSegment> &getDQTSegments() const {
+  segments::SOISegment *getSOISegment()  { return soi_.get(); }
+  segments::APP0Segment *getAPP0Segment()  { return app0_.get(); }
+  segments::COMSegment *getCOMSegment()  { return com_.get(); }
+  std::vector<segments::DQTSegment> &getDQTSegments()  {
     return dqt_segments_;
   }
-  const std::array<segments::QuantizationTable *, 16> &getQTableRefs() const {
+  std::array<segments::QuantizationTable *, 16> &getQTableRefs()  {
     return q_table_refs;
   }
-  const segments::SOF0Segment *getSOF0Segment() const { return sof0_.get(); }
-  const std::vector<segments::DHTSegment> &getDHTSegments() const {
+  segments::SOF0Segment *getSOF0Segment()  { return sof0_.get(); }
+  std::vector<segments::DHTSegment> &getDHTSegments()  {
     return dht_segments_;
   }
 
-  const segments::SOSSegment *getSOSSegment() const { return sos_.get(); }
-  const segments::EOISegment* getEOISegment() const {
+  segments::SOSSegment *getSOSSegment()  { return sos_.get(); }
+  segments::EOISegment* getEOISegment()  {
     return eoi_.get();
   }
-  const std::vector<uint8_t>& getEncodedData() const {
+  std::vector<uint8_t>& getEncodedData()  {
     return encoded_data_;
   }
 
@@ -246,7 +247,7 @@ private:
     dht.file_pos = static_cast<unsigned long>(stream.tellg());
     dht.length = StreamReader::read2BytesBigEndian(stream);
     auto b = StreamReader::readByte(stream);
-    dht.ac_or_dc = b >> 4;
+    dht.dc_or_ac = b >> 4;
     dht.table_id = b & 0x0F;
 
     static constexpr int kHuffmanTableSize = 16;

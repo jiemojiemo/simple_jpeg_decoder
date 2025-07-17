@@ -3,6 +3,7 @@
 //
 # pragma once
 #include "sjpg_log.h"
+#include "sjpg_bit_stream.h"
 #include <bitset>
 #include <map>
 #include <numeric>

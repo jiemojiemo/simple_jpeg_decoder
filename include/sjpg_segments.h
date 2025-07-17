@@ -144,7 +144,7 @@ class DHTSegment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
   uint16_t length{0};
-  uint8_t ac_or_dc{0}; // 0: DC, 1: AC
+  uint8_t dc_or_ac{0}; // 0: DC, 1: AC
   uint8_t table_id{0};
   std::vector<uint8_t> symbol_counts;
   std::vector<uint8_t> symbols;
@@ -154,7 +154,7 @@ public:
     LOG_INFO("DHT segment\n");
     LOG_INFO("\tFile position: %zu\n", file_pos);
     LOG_INFO("\tLength: %d\n", length);
-    LOG_INFO("\tAC or DC: %d\n", ac_or_dc);
+    LOG_INFO("\tDC(0)/AC(1): %d\n", dc_or_ac);
     LOG_INFO("\tTable ID: %d\n", table_id);
 
     LOG_INFO("\tSymbol counts(%zu): \n", symbol_counts.size());

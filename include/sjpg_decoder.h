@@ -134,7 +134,7 @@ private:
   bool isFileOpened() { return in_file_.is_open(); }
   void buildHuffmanTable() {
     for (const auto &dht : dht_) {
-      auto id = std::make_pair(dht.ac_or_dc, dht.table_id);
+      auto id = std::make_pair(dht.dc_or_ac, dht.table_id);
       auto table = HuffmanTable(dht.symbol_counts, dht.symbols);
       huffman_table_.insert({id, table});
     }
@@ -206,9 +206,9 @@ private:
     const auto &qtable = *(q_table_refs[qtable_id]);
 
     // decode ac value
-    auto dc_code_length = dc_htable.getSymbol(st_);
-    auto dc_bits = st_.getBitN(dc_code_length);
-    int16_t dc_value = decodeNumber(dc_code_length, dc_bits) + pre_dc_value;
+    auto dc_category = dc_htable.getSymbol(st_);
+    auto dc_bits = st_.getBitN(dc_category);
+    int16_t dc_value = decodeNumber(dc_category, dc_bits) + pre_dc_value;
     pre_dc_value = dc_value;
 
     int16_t dequant_dc_value = dc_value * qtable.data[0];
@@ -392,7 +392,7 @@ private:
     dht.file_pos = in_file_.tellg();
     dht.length = read2BytesBigEndian();
     auto b = readByte();
-    dht.ac_or_dc = b >> 4;
+    dht.dc_or_ac = b >> 4;
     dht.table_id = b & 0x0F;
 
     const static int huffman_table_size = 16;
