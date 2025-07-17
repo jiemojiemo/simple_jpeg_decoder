@@ -113,7 +113,7 @@ class SOF0Segment {
 public:
   size_t file_pos{0}; // segment start position in file(without marker)
   uint16_t length{0};
-  uint8_t precision{0};
+  uint8_t bitPerSample{0};
   uint16_t height{0};
   uint16_t width{0};
   uint8_t num_components{0};
@@ -126,13 +126,15 @@ public:
     LOG_INFO("SOF0 segment\n");
     LOG_INFO("\tFile position: %zu\n", file_pos);
     LOG_INFO("\tLength: %d\n", length);
-    LOG_INFO("\tPrecision: %d\n", precision);
+    LOG_INFO("\tBitPerSample: %d\n", bitPerSample);
     LOG_INFO("\tHeight: %d\n", height);
     LOG_INFO("\tWidth: %d\n", width);
     LOG_INFO("\tNumber of components: %d\n", num_components);
     for (size_t i = 0; i < num_components; i++) {
       LOG_INFO("\tComponent ID: %d\n", component_id[i]);
-      LOG_INFO("\tSampling factor: %d\n", sampling_factor[i]);
+      auto h_sampling_factor = sampling_factor[i] >> 4;
+      auto v_sampling_factor = sampling_factor[i] & 0x0F;
+      LOG_INFO("\tSampling factor: %d:%d\n", h_sampling_factor, v_sampling_factor);
       LOG_INFO("\tQuantization table ID: %d\n", quantization_table_id[i]);
     }
   }

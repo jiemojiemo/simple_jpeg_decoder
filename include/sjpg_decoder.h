@@ -355,7 +355,7 @@ private:
   int parseSOF0Segment() {
     sof0_.file_pos = in_file_.tellg();
     sof0_.length = read2BytesBigEndian();
-    sof0_.precision = readByte();
+    sof0_.bitPerSample = readByte();
     sof0_.height = read2BytesBigEndian();
     sof0_.width = read2BytesBigEndian();
     sof0_.num_components = readByte();
