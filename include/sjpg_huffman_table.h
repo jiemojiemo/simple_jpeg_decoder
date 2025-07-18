@@ -18,22 +18,8 @@ public:
                         std::vector<uint8_t> symbols)
       : symbol_counts_(std::move(symbol_counts)), symbols_(std::move(symbols)) {
     buildHuffmanTree();
-  }
 
-  std::vector<uint8_t> getSymbolsByHeight(uint8_t height) {
-    assert(height >= 1);
-
-    std::vector<uint8_t> symbols;
-    auto count_of_this_height = symbol_counts_[height];
-    auto count_sum_of_pre_heights = std::accumulate(
-        symbol_counts_.begin(), symbol_counts_.begin() + height, 0);
-
-    for (auto i = count_sum_of_pre_heights;
-         i < count_sum_of_pre_heights + count_of_this_height; i++) {
-      symbols.push_back(symbols_[i]);
-    }
-
-    return symbols;
+    code_symbol_map = buildHuffmanTable(symbol_counts_, symbols_);
   }
 
   bool contains(const std::string &code) const {
@@ -88,6 +74,32 @@ private:
       code *= 2;
     }
   }
+
+  static std::map<std::string, uint16_t> buildHuffmanTable(
+    const std::vector<uint8_t>& counts, // counts[16]
+    const std::vector<uint8_t>& symbols // n个
+) {
+    constexpr static auto kMaxHuffmanCodeLength = 16;
+    assert(counts.size() == kMaxHuffmanCodeLength);
+
+    std::map<std::string, uint16_t> table;
+    int code = 0;
+    int symInd = 0;
+    // length: 1 ~ 16 (JPEG哈夫曼表的码长范围)
+    for (int length = 1; length <= kMaxHuffmanCodeLength; ++length) {
+      int numCodes = counts[length - 1];
+      for (int i = 0; i < numCodes; ++i) {
+        // 生成指定位长的二进制字符串
+        std::string codeStr = std::bitset<16>(code).to_string().substr(16 - length, length);
+        table[codeStr] = symbols[symInd++];
+        code++;
+      }
+      code <<= 1;
+    }
+    return table;
+  }
+
+
   std::vector<uint8_t> symbol_counts_;
   std::vector<uint8_t> symbols_;
   std::map<std::string, uint16_t> code_symbol_map;

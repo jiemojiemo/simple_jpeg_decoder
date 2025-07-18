@@ -24,16 +24,6 @@ TEST_F(AHuffmanTable, CanBuildWithCountsAndSymbols) {
   ASSERT_THAT(htable.getSymbols(), Eq(symbols));
 }
 
-TEST_F(AHuffmanTable, CanGetSymbolsByHeights) {
-  auto htable = HuffmanTable(sym_counts, symbols);
-
-  auto symbols = htable.getSymbolsByHeight(1);
-  ASSERT_THAT(symbols, ElementsAre(0, 1, 2));
-
-  symbols = htable.getSymbolsByHeight(2);
-  ASSERT_THAT(symbols, ElementsAre(3));
-}
-
 TEST_F(AHuffmanTable, CanPrintHuffmanCodesAndSymbols) {
   auto htable = HuffmanTable(sym_counts, symbols);
 
